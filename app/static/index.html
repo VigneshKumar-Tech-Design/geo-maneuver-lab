@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GEO Maneuver Lab</title><link rel="stylesheet" href="/static/styles.css">
+<!-- Plotly is the only frontend dependency: it covers 3D, ground track and all time series. -->
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script></head>
+<body>
+<aside>
+  <h1>GEO Maneuver Lab</h1>
+  <section><h2>Mission</h2>
+    <label>Satellite name<input id="name" value="GEO-1"></label>
+    <label>Epoch (UTC)<input id="epoch" value="2026-01-01T00:00:00"></label>
+    <div class="g2"><label>Semi-major axis (km)<input id="a_km" type="number" step="any" value="42164.17"></label>
+    <label>Eccentricity<input id="e" type="number" step="any" value="0.0002"></label>
+    <label>Inclination (°)<input id="inc_deg" type="number" step="any" value="0.05"></label>
+    <label>RAAN (°)<input id="raan_deg" type="number" step="any" value="0"></label>
+    <label>Arg. of perigee (°)<input id="argp_deg" type="number" step="any" value="0"></label>
+    <label>Slot longitude (°E)<input id="ref_lon_deg" type="number" step="any" value="75"></label>
+    <label>Observer lat (°)<input id="obs_lat_deg" type="number" step="any" value="20"></label>
+    <label>Observer lon (°E)<input id="obs_lon_deg" type="number" step="any" value="78"></label>
+    <label>Duration (h)<input id="duration_h" type="number" step="any" value="168"></label>
+    <label>Step (s)<input id="step_s" type="number" step="any" value="600"></label>
+    <label>μ (km³/s²)<input id="mu" type="number" step="any" value="398600.4418"></label>
+    <label>Force model<select id="model"><option value="j2">Earth J2</option><option value="two_body">Two-body</option></select></label></div>
+    <button id="preset" class="ghost">Reset to GEO preset</button>
+    <details><summary>Geostationary vs geosynchronous</summary><p>A geosynchronous orbit has a period of one sidereal day (a ≈ 42,164 km). A geostationary orbit is the special case that is also circular and equatorial, so the satellite holds one point on the equator. Tilt it and the ground track becomes a figure-eight; make it eccentric and the track swings east–west.</p></details>
+    <p class="note">The satellite is placed over the slot longitude at the epoch (exact when inclination is ~0). True-anomaly input only.</p>
+  </section>
+  <section><h2>Maneuvers</h2>
+    <div class="g2"><label>Type<select id="mtype"><option>prograde</option><option>retrograde</option><option>radial</option><option>normal</option><option>custom</option></select></label>
+    <label>Epoch (h after start)<input id="mt" type="number" step="any" value="24"></label>
+    <label>Δv (m/s)<input id="mdv" type="number" step="any" value="1"></label><span></span>
+    <label>R (m/s)<input id="mdr" type="number" step="any" value="0"></label>
+    <label>T (m/s)<input id="mdt" type="number" step="any" value="0"></label>
+    <label>N (m/s)<input id="mdn" type="number" step="any" value="0"></label></div>
+    <p class="note">R, T, N apply only to “custom”. RTN: R radial, T along-track, N cross-track.</p>
+    <button id="addMan" class="ghost">Add maneuver</button>
+    <ul id="manList"></ul>
+  </section>
+  <section><h2>Run</h2>
+    <button id="run">Run simulation</button><div id="err" role="alert"></div>
+    <div class="row"><button id="back" class="ghost">◀ Step</button><button id="play" class="ghost">Play</button><button id="fwd" class="ghost">Step ▶</button><button id="reset" class="ghost">Reset</button></div>
+    <div class="row"><button id="csv" class="ghost">Export CSV</button><button id="json" class="ghost">Export JSON</button></div>
+    <p class="note">Every run compares the maneuvered path (amber) with a no‑maneuver baseline (blue).</p>
+  </section>
+</aside>
+<main>
+  <div class="bar"><input id="slider" type="range" min="0" max="0" value="0"><output id="clock">Run a simulation to begin</output>
+    <label>Frame<select id="frame"><option value="eci">ECI (inertial)</option><option value="ecef">ECEF (Earth-fixed)</option></select></label>
+    <label>Orbital element<select id="elem"><option value="a">Semi-major axis (km)</option><option value="e">Eccentricity</option><option value="i">Inclination (°)</option><option value="raan">RAAN (°)</option><option value="period_h">Period (h)</option></select></label></div>
+  <div class="grid">
+    <div id="p3d" class="wide"></div><div id="pgt"></div><div id="plon"></div>
+    <div id="pdrift"></div><div id="pel"></div><div id="ppq"></div><div id="pres"></div><div id="psky"></div>
+  </div>
+  <p class="note frame-note">In ECI the GEO orbit is a circle; in ECEF the same satellite is a fixed point (the “orbit” collapses). Pick the frame that matches the question.</p>
+</main>
+<script src="/static/app.js"></script></body></html>
